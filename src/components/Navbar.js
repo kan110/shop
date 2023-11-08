@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux"
-import { setCategory } from "../features/shop/shopSlice";
+import { useSelector } from "react-redux"
 
 import logo from "../images/logo.svg"
 import Searchbar from "./Searchbar";
 
-import {Link as RouterLink, useNavigate} from "react-router-dom"
+import {Link as RouterLink} from "react-router-dom"
 
 import {useTheme, useMediaQuery} from "@mui/material";
 import {styled} from '@mui/material/styles';
@@ -34,37 +33,54 @@ const NavbarIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 export default function Navbar () {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-
     const {amount} = useSelector((state) => state.cart);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     const theme = useTheme();
     const isScreenSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const handleCategoryClick = (event) => {
-        dispatch(setCategory(event.target.id));
-        navigate('/');
+    const categories = ["men's clothing", "women's clothing", "electronics", "jewelery"];
+
+    const getCategoryURL = (category) => {
+        let categoryURL = category.replace(' ', '-');
+        categoryURL = categoryURL.replace("'", '');
+        if (categoryURL === "jewelery") {
+            return 'jewelry';
+        }
+        return categoryURL;
     }
 
-    const categories = ["men's clothing", "women's clothing", "electronics", "jewelery"];
-    let categoryButtons = categories.map((category) => 
-        <CategoryButton 
-            disableRipple
-            key={category} 
-            id={category} 
-            onClick={handleCategoryClick}
+    let categoryButtons = [
+        <Link
+            component={RouterLink}
+            to='/'
+            key='all'
         >
-            {category === 'jewelery' ? 'jewelry' : category}
-        </CategoryButton>
-    );
+            <CategoryButton id="" key="all">ALL</CategoryButton>
+        </Link>
+    ];
+    categories.forEach((category) => {
+        categoryButtons.push(
+            <Link
+                component={RouterLink}
+                to={`/${getCategoryURL(category)}`}
+                key={category} 
+            >
+                <CategoryButton 
+                    disableRipple
+                    id={category} 
+                >
+                    {category === 'jewelery' ? 'jewelry' : category}
+                </CategoryButton>
+            </Link>
+        )
+    });
 
     return (
         <>
             <AppBar position='static' sx={{boxShadow: 'none', backgroundColor: 'transparent'}}>
                 <Toolbar>
-                    {isScreenSmall && <MobileMenu/>}
+                    {isScreenSmall && <MobileMenu getCategoryURL={getCategoryURL} />}
                     <Link component={RouterLink} to="/" sx={{textDecoration: 'none', color: 'common.black', marginLeft: 1}}>
                         <Box
                         component='img'
@@ -114,7 +130,6 @@ export default function Navbar () {
                 {!isScreenSmall &&
                     <Toolbar>
                         <Stack width={1} direction='row' spacing={5} sx={{justifyContent: 'center'}}>
-                            <CategoryButton id="" onClick={handleCategoryClick} key="all">ALL</CategoryButton>
                             {categoryButtons}
                         </Stack>
                     </Toolbar>
@@ -124,9 +139,7 @@ export default function Navbar () {
     )
 }
 
-function MobileMenu () {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+function MobileMenu ({getCategoryURL}) {
     const [anchorEl, setAnchorEl] = useState(null);
     const openMenu = Boolean(anchorEl);
 
@@ -138,25 +151,44 @@ function MobileMenu () {
         setAnchorEl(null);
     }
 
-    const handleCategoryClick = (event) => {
-        handleMenuClose();
-        dispatch(setCategory(event.target.id));
-        navigate('/');
-    }
-
     const categories = ["men's clothing", "women's clothing", "electronics", "jewelery"];
-    let menuItems = categories.map((category) => 
-        <MenuItem
-            key={category}
-            id={category}
-            onClick={handleCategoryClick}
+    let menuItems = [
+        <Link
+            component={RouterLink}
+            to={`/`}
+            key='all'
             sx={{
+                color: 'inherit',
+                textDecoration: 'none',
                 textTransform: 'uppercase'
             }}
         >
-            {category === 'jewelery' ? 'jewelry' : category}
-        </MenuItem>
-    );
+            <MenuItem id='' onClick={handleMenuClose}>all</MenuItem>
+        </Link>
+    ];
+    
+    categories.forEach((category) => {
+        menuItems.push(
+            <Link
+                component={RouterLink}
+                to={`/${getCategoryURL(category)}`}
+                key={category}
+                sx={{
+                    color: 'inherit',
+                    textDecoration: 'none',
+                    textTransform: 'uppercase'
+                }}
+            >
+                <MenuItem
+                    key={category}
+                    id={category}
+                    onClick={handleMenuClose}
+                >
+                    {category === 'jewelery' ? 'jewelry' : category}
+                </MenuItem>
+            </Link>
+        )
+    });
 
     return (
         <>
@@ -179,7 +211,6 @@ function MobileMenu () {
                 }}
                 onClose={handleMenuClose}
             >
-                <MenuItem id='' onClick={handleCategoryClick}>ALL</MenuItem>
                 {menuItems}
             </Menu>
         </>
@@ -189,12 +220,12 @@ function MobileMenu () {
 function MobileSearch ({isDrawerOpen, setIsDrawerOpen}) {
     return (
         <>
-            <IconButton
+            <NavbarIconButton
                 aria-label='search'
                 onClick={() => setIsDrawerOpen(true)}
             >
                 <SearchIcon/>
-            </IconButton>
+            </NavbarIconButton>
 
             <Drawer 
                 anchor='top'

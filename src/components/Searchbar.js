@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { setSearch, setCategory } from "../features/shop/shopSlice";
+import { setSearch } from "../features/shop/shopSlice";
 
 import { useNavigate } from "react-router-dom";
 
@@ -13,7 +13,6 @@ export default function Searchbar ({setIsDrawerOpen}) {
     const handleSearch = (e) => {
         e.preventDefault();
         dispatch(setSearch(document.getElementById('searchInput').value));
-        dispatch(setCategory(''));
         document.getElementById('searchInput').value = '';
         navigate('/');
         setIsDrawerOpen(false);

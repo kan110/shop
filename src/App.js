@@ -51,6 +51,7 @@ export default function App() {
         <Stack sx={{flexGrow: 1}}>
           <Routes> 
             <Route path="/" element={<Shop/>}/>
+            <Route path="/:category" element={<Shop/>}/>
             <Route path="/cart" element={<Cart/>}/>
             <Route path="/wishlist" element={<Wishlist/>}/>
             <Route path="/item/:id" element={<Product/>}/>

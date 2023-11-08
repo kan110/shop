@@ -1,7 +1,12 @@
-import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-export const getShopItems = createAsyncThunk('shop/getShopItems', () => {
-    return fetch('https://fakestoreapi.com/products')
+export const getShopItems = createAsyncThunk('shop/getShopItems', async (category) => {
+    if (!category) {
+        return fetch('https://fakestoreapi.com/products')
+        .then((res) => res.json())
+        .catch((err) => console.log(err));
+    }
+    return fetch(`https://fakestoreapi.com/products/category/${category}`)
     .then((res) => res.json())
     .catch((err) => console.log(err));
 });
@@ -10,7 +15,6 @@ const initialState = {
     shopItems: [],
     isLoading: true,
     searchTerm: '',
-    searchCategory: '',
     recentlyViewed: []
 };
 
@@ -20,9 +24,6 @@ const shopSlice = createSlice({
     reducers: {
         setSearch: (state, {payload}) => {
             state.searchTerm = payload;
-        },
-        setCategory: (state, {payload}) => {
-            state.searchCategory = payload;
         },
         clearRecent: (state) => {
             state.recentlyViewed = [];
@@ -50,12 +51,5 @@ const shopSlice = createSlice({
 
 export default shopSlice.reducer;
 
-export const selectItemsByCategory = createSelector([(state) => state.shop.shopItems, (state) => state.shop.searchCategory], (items, category) => {
-    if (category) {
-        return items.filter(item => item.category === category);
-    }
-    return items;
-});
-
-export const {setSearch, setCategory, clearRecent, addToRecent} = shopSlice.actions;
+export const {setSearch, clearRecent, addToRecent} = shopSlice.actions;
 

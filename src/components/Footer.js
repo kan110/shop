@@ -7,7 +7,7 @@ export default function Footer () {
     }}>
         <Divider/>
         <Typography sx={{paddingY: 2, paddingX: 3}}>
-            Project by <Link href='' target='_blank' rel='noreferrer'></Link>, code on <Link href='' target='_blank' rel='noreferrer'>Github</Link>.
+            View project on <Link href='https://github.com/kan110/shop' target='_blank' rel='noreferrer'>Github</Link>.
         </Typography>
     </ Box>
 }
